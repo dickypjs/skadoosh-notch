@@ -1,4 +1,4 @@
-name: Build SkadooshNotch EXE
+name: Build SkadooshNotch Rust EXE
 
 on:
   push:
@@ -15,21 +15,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET 8
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Restore dependencies
-        run: dotnet restore SkadooshNotch.csproj
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
 
-      - name: Build & Publish (Framework-Dependent, ~3 MB)
-        run: dotnet publish SkadooshNotch.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:DebugType=none -p:DebugSymbols=false -o publish/
+      - name: Build Release (Native Windows x86_64)
+        run: cargo build --release
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SkadooshNotch-exe
-          path: publish/SkadooshNotch.exe
+          name: SkadooshNotch-rust-exe
+          path: target/release/skadoosh-notch.exe
           if-no-files-found: error
           retention-days: 30
