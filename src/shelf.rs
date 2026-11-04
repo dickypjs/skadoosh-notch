@@ -1,6 +1,5 @@
 use crate::config::get_app_dir;
 use std::fs;
-use std::path::PathBuf;
 use std::process::Command;
 
 pub struct ShelfManager {

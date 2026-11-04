@@ -1,4 +1,5 @@
 #![windows_subsystem = "windows"]
+#![allow(dead_code, unused_variables, unused_must_use)]
 
 mod clipboard;
 mod config;
@@ -10,10 +11,10 @@ mod shelf;
 use chrono::Local;
 use config::Config;
 use media::MediaManager;
-use prayer::{calculate_times, find_city, next_prayer, CITIES};
+use prayer::{calculate_times, find_city, next_prayer};
 use shelf::ShelfManager;
 use clipboard::ClipboardManager;
-use power::PowerManager;
+
 
 use std::sync::{Arc, Mutex};
 use std::time::Instant;

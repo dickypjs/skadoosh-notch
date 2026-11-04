@@ -1,4 +1,4 @@
-use chrono::{DateTime, Datelike, Local, NaiveDate, NaiveDateTime, NaiveTime, Timelike};
+use chrono::{DateTime, Datelike, Local, NaiveDate, NaiveDateTime, NaiveTime};
 use std::f64::consts::PI;
 
 #[derive(Debug, Clone)]

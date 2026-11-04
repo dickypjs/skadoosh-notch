@@ -18,11 +18,9 @@ impl PowerManager {
     }
 
     pub fn lock_pc() {
-        #[cfg(target_os = "windows")]
-        unsafe {
-            use windows::Win32::UI::WindowsAndMessaging::LockWorkStation;
-            let _ = LockWorkStation();
-        }
+        let _ = Command::new("rundll32.exe")
+            .args(["user32.dll,LockWorkStation"])
+            .spawn();
     }
 
     pub fn sleep_pc() {
