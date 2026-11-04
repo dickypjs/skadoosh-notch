@@ -152,11 +152,13 @@ public class MediaService
         try
         {
             using var stream = await streamRef.OpenReadAsync();
-            using var netStream = stream.AsStreamForRead();
-            using var ms = new MemoryStream();
-            await netStream.CopyToAsync(ms);
-            ms.Position = 0;
-
+            var bytes = new byte[stream.Size];
+            using (var reader = new DataReader(stream))
+            {
+                await reader.LoadAsync((uint)stream.Size);
+                reader.ReadBytes(bytes);
+            }
+            using var ms = new MemoryStream(bytes);
             var bmp = new BitmapImage();
             bmp.BeginInit();
             bmp.CacheOption = BitmapCacheOption.OnLoad;

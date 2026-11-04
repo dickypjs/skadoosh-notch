@@ -24,15 +24,7 @@ jobs:
         run: dotnet restore SkadooshNotch.csproj
 
       - name: Build & Publish (Framework-Dependent, ~3 MB)
-        run: |
-          dotnet publish SkadooshNotch.csproj `
-            -c Release `
-            -r win-x64 `
-            --self-contained false `
-            -p:PublishSingleFile=true `
-            -p:DebugType=none `
-            -p:DebugSymbols=false `
-            -o publish/
+        run: dotnet publish SkadooshNotch.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:DebugType=none -p:DebugSymbols=false -o publish/
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
