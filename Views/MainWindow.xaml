@@ -1,0 +1,321 @@
+<Window x:Class="SkadooshNotch.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Skadoosh-Notch"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        WindowStartupLocation="Manual"
+        SizeToContent="Height"
+        MinHeight="36">
+
+  <Window.Resources>
+    <!-- Animasi expand -->
+    <Storyboard x:Key="ExpandAnim">
+      <DoubleAnimation Storyboard.TargetName="NotchBorder"
+                       Storyboard.TargetProperty="Height"
+                       To="260" Duration="0:0:0.25">
+        <DoubleAnimation.EasingFunction>
+          <CubicEase EasingMode="EaseOut"/>
+        </DoubleAnimation.EasingFunction>
+      </DoubleAnimation>
+    </Storyboard>
+    <Storyboard x:Key="CollapseAnim">
+      <DoubleAnimation Storyboard.TargetName="NotchBorder"
+                       Storyboard.TargetProperty="Height"
+                       To="36" Duration="0:0:0.2">
+        <DoubleAnimation.EasingFunction>
+          <CubicEase EasingMode="EaseIn"/>
+        </DoubleAnimation.EasingFunction>
+      </DoubleAnimation>
+    </Storyboard>
+    <Storyboard x:Key="MiniAnim">
+      <DoubleAnimation Storyboard.TargetName="NotchBorder"
+                       Storyboard.TargetProperty="Height"
+                       To="22" Duration="0:0:0.2">
+        <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseInOut"/></DoubleAnimation.EasingFunction>
+      </DoubleAnimation>
+    </Storyboard>
+  </Window.Resources>
+
+  <Grid x:Name="RootGrid">
+    <!-- Notch utama -->
+    <Border x:Name="NotchBorder"
+            Height="36"
+            MinWidth="320"
+            MaxWidth="600"
+            CornerRadius="0,0,18,18"
+            Background="#E00D0D0D"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Top"
+            MouseEnter="NotchBorder_MouseEnter"
+            MouseLeave="NotchBorder_MouseLeave"
+            MouseLeftButtonDown="NotchBorder_MouseLeftButtonDown"
+            ClipToBounds="True">
+
+      <Border.Effect>
+        <DropShadowEffect BlurRadius="24" ShadowDepth="6" Color="Black" Opacity="0.6"/>
+      </Border.Effect>
+
+      <Grid>
+        <!-- Collapsed bar (default) -->
+        <Grid x:Name="CollapsedBar" Height="36" VerticalAlignment="Top">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+
+          <!-- Kiri: Jam & Sholat -->
+          <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+            <TextBlock x:Name="TbClock" Text="00:00" Foreground="White" FontSize="13" FontWeight="SemiBold"/>
+            <TextBlock x:Name="TbPrayer" Text="" Foreground="#FF4CAF50" FontSize="10" Margin="8,0,0,0" VerticalAlignment="Center"/>
+          </StackPanel>
+
+          <!-- Tengah: Media pill -->
+          <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+            <TextBlock x:Name="TbMediaPill" Text="" Foreground="#BBFFFFFF" FontSize="10" MaxWidth="160"
+                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+          </StackPanel>
+
+          <!-- Kanan: Ikon quick -->
+          <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right"
+                      VerticalAlignment="Center" Margin="0,0,8,0">
+            <Button x:Name="BtnMedia"  Content="♪" Style="{StaticResource GhostBtn}" Padding="4,2" FontSize="12" Click="BtnMedia_Click" ToolTip="Media Player"/>
+            <Button x:Name="BtnPrayer" Content="🕌" Style="{StaticResource GhostBtn}" Padding="4,2" FontSize="12" Click="BtnPrayer_Click" ToolTip="Waktu Sholat"/>
+            <Button x:Name="BtnTodo"   Content="✓" Style="{StaticResource GhostBtn}" Padding="4,2" FontSize="12" Click="BtnTodo_Click" ToolTip="To-Do"/>
+            <Button x:Name="BtnNote"   Content="📝" Style="{StaticResource GhostBtn}" Padding="4,2" FontSize="11" Click="BtnNote_Click" ToolTip="Notes"/>
+            <Button x:Name="BtnClip"   Content="📋" Style="{StaticResource GhostBtn}" Padding="4,2" FontSize="11" Click="BtnClip_Click" ToolTip="Clipboard"/>
+            <Button x:Name="BtnShelf"  Content="📂" Style="{StaticResource GhostBtn}" Padding="4,2" FontSize="11" Click="BtnShelf_Click" ToolTip="File Shelf"
+                    AllowDrop="True" Drop="BtnShelf_Drop" DragEnter="BtnShelf_DragEnter"/>
+            <Button x:Name="BtnPower"  Content="⏻" Style="{StaticResource GhostBtn}" Padding="4,2" FontSize="12" Click="BtnPower_Click" ToolTip="Power / Screen"/>
+            <Button x:Name="BtnCal"    Content="📅" Style="{StaticResource GhostBtn}" Padding="4,2" FontSize="11" Click="BtnCal_Click" ToolTip="Kalender"/>
+          </StackPanel>
+        </Grid>
+
+        <!-- Expanded panel -->
+        <ScrollViewer x:Name="ExpandedPanel" Visibility="Collapsed" VerticalScrollBarVisibility="Auto"
+                      Margin="0,36,0,0" MaxHeight="224">
+          <StackPanel Margin="10,4,10,10">
+
+            <!-- MEDIA PLAYER -->
+            <Border x:Name="PanelMedia" Style="{StaticResource PanelCard}" Visibility="Collapsed" Margin="0,0,0,6">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="52"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Width="48" Height="48" CornerRadius="6">
+                  <Border.Background>
+                    <ImageBrush x:Name="MediaThumbBrush" Stretch="UniformToFill"/>
+                  </Border.Background>
+                </Border>
+                <StackPanel Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center">
+                  <TextBlock x:Name="TbMediaTitle" Text="Tidak ada media" Foreground="White" FontSize="12" FontWeight="Medium" TextTrimming="CharacterEllipsis"/>
+                  <TextBlock x:Name="TbMediaArtist" Text="" Foreground="#AAFFFFFF" FontSize="10" TextTrimming="CharacterEllipsis"/>
+                  <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                    <Button Content="⏮" Style="{StaticResource GhostBtn}" Padding="6,2" Click="BtnPrev_Click"/>
+                    <Button x:Name="BtnPlayPause" Content="▶" Style="{StaticResource GhostBtn}" Padding="8,2" Margin="4,0" Click="BtnPlayPause_Click"/>
+                    <Button Content="⏭" Style="{StaticResource GhostBtn}" Padding="6,2" Click="BtnNext_Click"/>
+                  </StackPanel>
+                </StackPanel>
+              </Grid>
+            </Border>
+
+            <!-- LIRIK -->
+            <Border x:Name="PanelLyrics" Style="{StaticResource PanelCard}" Visibility="Collapsed" Margin="0,0,0,6" MaxHeight="100">
+              <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <TextBlock x:Name="TbLyrics" Text="" Foreground="#CCFFFFFF" FontSize="10" TextWrapping="Wrap" LineHeight="16"/>
+              </ScrollViewer>
+            </Border>
+
+            <!-- WAKTU SHOLAT -->
+            <Border x:Name="PanelPrayer" Style="{StaticResource PanelCard}" Visibility="Collapsed" Margin="0,0,0,6">
+              <StackPanel>
+                <TextBlock Text="Jadwal Sholat" Foreground="White" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                <ItemsControl x:Name="PrayerList">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="*"/>
+                          <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Name}" Foreground="#CCFFFFFF" FontSize="10"/>
+                        <TextBlock Grid.Column="1" Text="{Binding TimeStr}" Foreground="#FF4CAF50" FontSize="10"/>
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                  <TextBlock Text="Suara:" Foreground="#AAFFFFFF" FontSize="10" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                  <Button Content="Pilih File Adzan" Style="{StaticResource GhostBtn}" Padding="6,3" FontSize="10" Click="BtnPickAdzan_Click"/>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <!-- TO-DO -->
+            <Border x:Name="PanelTodo" Style="{StaticResource PanelCard}" Visibility="Collapsed" Margin="0,0,0,6">
+              <StackPanel>
+                <Grid Margin="0,0,0,6">
+                  <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                  <TextBlock Text="To-Do" Foreground="White" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                  <Button Grid.Column="1" Content="+ Tambah" Style="{StaticResource GhostBtn}" Padding="6,2" FontSize="10" Click="BtnAddTodo_Click"/>
+                </Grid>
+                <ItemsControl x:Name="TodoList">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="Auto"/>
+                          <ColumnDefinition Width="*"/>
+                          <ColumnDefinition Width="Auto"/>
+                          <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Grid.Column="0" IsChecked="{Binding Done}" VerticalAlignment="Center"
+                                  Checked="TodoItem_Toggle" Unchecked="TodoItem_Toggle"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Title}" Foreground="#CCFFFFFF" FontSize="10"
+                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="6,0"/>
+                        <TextBlock Grid.Column="2" Text="{Binding DeadlineStr}" Foreground="#88FFFF00"
+                                   FontSize="9" VerticalAlignment="Center" Margin="4,0"/>
+                        <Button Grid.Column="3" Content="✕" Style="{StaticResource GhostBtn}" Padding="4,0"
+                                FontSize="10" Click="TodoItem_Delete"/>
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+
+            <!-- NOTES -->
+            <Border x:Name="PanelNote" Style="{StaticResource PanelCard}" Visibility="Collapsed" Margin="0,0,0,6">
+              <StackPanel>
+                <Grid Margin="0,0,0,6">
+                  <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                  <TextBlock Text="Quick Notes" Foreground="White" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                  <Button Grid.Column="1" Content="+ Baru" Style="{StaticResource GhostBtn}" Padding="6,2" FontSize="10" Click="BtnAddNote_Click"/>
+                </Grid>
+                <TextBox x:Name="TbActiveNote" Background="#1AFFFFFF" Foreground="White" BorderThickness="0"
+                         FontSize="10" TextWrapping="Wrap" AcceptsReturn="True" MaxHeight="80"
+                         VerticalScrollBarVisibility="Auto" Padding="6" TextChanged="TbActiveNote_Changed"/>
+              </StackPanel>
+            </Border>
+
+            <!-- CLIPBOARD -->
+            <Border x:Name="PanelClipboard" Style="{StaticResource PanelCard}" Visibility="Collapsed" Margin="0,0,0,6">
+              <StackPanel>
+                <Grid Margin="0,0,0,6">
+                  <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                  <TextBlock Text="Clipboard" Foreground="White" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                  <Button Grid.Column="1" Content="Hapus Semua" Style="{StaticResource GhostBtn}" Padding="6,2" FontSize="9" Click="BtnClearClip_Click"/>
+                </Grid>
+                <ItemsControl x:Name="ClipList" MaxHeight="100">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Border Background="#12FFFFFF" CornerRadius="4" Padding="6,4" Margin="0,2" Cursor="Hand"
+                              MouseLeftButtonDown="ClipItem_Click">
+                        <TextBlock Text="{Binding Text}" Foreground="#CCFFFFFF" FontSize="10"
+                                   TextTrimming="CharacterEllipsis" MaxWidth="300"/>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+
+            <!-- SHELF -->
+            <Border x:Name="PanelShelf" Style="{StaticResource PanelCard}" Visibility="Collapsed" Margin="0,0,0,6"
+                    AllowDrop="True" Drop="PanelShelf_Drop" DragEnter="PanelShelf_DragEnter">
+              <StackPanel>
+                <TextBlock Text="File Shelf  (drag file ke sini)" Foreground="White" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                <ItemsControl x:Name="ShelfList">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="*"/>
+                          <ColumnDefinition Width="Auto"/>
+                          <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding}" Foreground="#CCFFFFFF" FontSize="10"
+                                   TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Cursor="Hand"
+                                   MouseLeftButtonDown="ShelfItem_Open"/>
+                        <Button Grid.Column="2" Content="✕" Style="{StaticResource GhostBtn}" Padding="4,0"
+                                FontSize="10" Click="ShelfItem_Remove"/>
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+
+            <!-- POWER / SCREEN -->
+            <Border x:Name="PanelPower" Style="{StaticResource PanelCard}" Visibility="Collapsed" Margin="0,0,0,6">
+              <StackPanel>
+                <TextBlock Text="Power &amp; Layar" Foreground="White" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                  <Button Content="🔒 Lock" Style="{StaticResource GhostBtn}" Padding="8,4" FontSize="10" Margin="0,0,6,0" Click="BtnLock_Click"/>
+                  <Button Content="🖥️ Layar Mati" Style="{StaticResource GhostBtn}" Padding="8,4" FontSize="10" Margin="0,0,6,0" Click="BtnScreenOff_Click"/>
+                  <Button Content="💤 Sleep" Style="{StaticResource GhostBtn}" Padding="8,4" FontSize="10" Click="BtnSleep_Click"/>
+                </StackPanel>
+                <Grid Margin="0,4,0,0">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Text="Layar mati setelah:" Foreground="#AAFFFFFF" FontSize="10" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                  <Slider x:Name="SliderScreenTimeout" Grid.Column="1" Minimum="1" Maximum="60" Value="10"
+                          TickFrequency="5" VerticalAlignment="Center" ValueChanged="SliderScreenTimeout_Changed"/>
+                  <TextBlock x:Name="TbScreenTimeout" Grid.Column="2" Text="10" Foreground="#FF4CAF50"
+                             FontSize="10" VerticalAlignment="Center" Margin="4,0,2,0"/>
+                  <TextBlock Grid.Column="3" Text="mnt" Foreground="#AAFFFFFF" FontSize="10" VerticalAlignment="Center"/>
+                </Grid>
+                <Grid Margin="0,4,0,0">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Text="Sleep setelah:" Foreground="#AAFFFFFF" FontSize="10" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                  <Slider x:Name="SliderSleepTimeout" Grid.Column="1" Minimum="1" Maximum="120" Value="30"
+                          TickFrequency="10" VerticalAlignment="Center" ValueChanged="SliderSleepTimeout_Changed"/>
+                  <TextBlock x:Name="TbSleepTimeout" Grid.Column="2" Text="30" Foreground="#FF4CAF50"
+                             FontSize="10" VerticalAlignment="Center" Margin="4,0,2,0"/>
+                  <TextBlock Grid.Column="3" Text="mnt" Foreground="#AAFFFFFF" FontSize="10" VerticalAlignment="Center"/>
+                </Grid>
+              </StackPanel>
+            </Border>
+
+            <!-- KALENDER MINI -->
+            <Border x:Name="PanelCalendar" Style="{StaticResource PanelCard}" Visibility="Collapsed" Margin="0,0,0,6">
+              <Calendar x:Name="MiniCalendar" Background="Transparent" Foreground="White"
+                        BorderThickness="0" SelectionMode="SingleDate"
+                        CalendarDayButtonStyle="{x:Null}"/>
+            </Border>
+
+            <!-- SCREENSHOT MODE -->
+            <Border x:Name="PanelCapture" Style="{StaticResource PanelCard}" Visibility="Collapsed" Margin="0,0,0,6">
+              <StackPanel>
+                <TextBlock Text="Screenshot  (Ctrl+Shift+R)" Foreground="White" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                <StackPanel Orientation="Horizontal">
+                  <Button Content="✂ Sebagian" Style="{StaticResource GhostBtn}" Padding="10,5" FontSize="10" Margin="0,0,6,0" Click="BtnSnapArea_Click"/>
+                  <Button Content="🖥 Full" Style="{StaticResource GhostBtn}" Padding="10,5" FontSize="10" Margin="0,0,6,0" Click="BtnSnapFull_Click"/>
+                  <Button Content="⏺ Record" Style="{StaticResource GhostBtn}" Padding="10,5" FontSize="10" Click="BtnRecord_Click"/>
+                </StackPanel>
+                <TextBlock x:Name="TbCaptureResult" Text="" Foreground="#FF4CAF50" FontSize="9" Margin="0,6,0,0" TextWrapping="Wrap"/>
+              </StackPanel>
+            </Border>
+
+          </StackPanel>
+        </ScrollViewer>
+
+      </Grid>
+    </Border>
+  </Grid>
+</Window>
